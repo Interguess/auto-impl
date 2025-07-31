@@ -1,4 +1,4 @@
-package com.interguess.autoimpl.annotationprocessor;
+package com.interguess.autoimpl.annotationprocessor.generator;
 
 import com.interguess.autoimpl.annotationprocessor.collectors.FieldCollector;
 import com.interguess.autoimpl.annotationprocessor.collectors.MethodCollector;
@@ -17,6 +17,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import java.io.Writer;
 
 public class ImplementationClassGenerator {
 
@@ -61,6 +62,8 @@ public class ImplementationClassGenerator {
         final String ctorCode = fieldCollector.generateCtorCode(className);
         final String methodsCode = methodCollector.generateMethodsCode();
 
+       // System.out.println(methodsCode);
+
         final String classHeader = ResourceFileLoaderUtil.load("/class_header.txt");
         final String classStructure = ResourceFileLoaderUtil.load("/class_structure.txt");
 
@@ -77,7 +80,7 @@ public class ImplementationClassGenerator {
         try {
             final JavaFileObject fileObject = processingEnv.getFiler().createSourceFile(qualifiedClassName, interfaceElement);
 
-            try (final java.io.Writer writer = fileObject.openWriter()) {
+            try (final Writer writer = fileObject.openWriter()) {
                 writer.write(classSource);
             }
         } catch (Exception e) {

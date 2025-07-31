@@ -1,7 +1,7 @@
 package com.interguess.autoimpl.annotationprocessor.processors;
 
 import com.google.auto.service.AutoService;
-import com.interguess.autoimpl.annotationprocessor.ImplementationClassGenerator;
+import com.interguess.autoimpl.annotationprocessor.generator.ImplementationClassGenerator;
 import com.interguess.autoimpl.api.annotations.AutoImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
