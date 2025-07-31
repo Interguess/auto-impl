@@ -37,6 +37,8 @@ public class AutoImplProcessor extends AbstractProcessor {
                     "AutoImplProcessor is not initialized properly. " +
                             "Please ensure that the processing environment is set up correctly."
             );
+
+            return false;
         }
 
         for (final Element element : roundEnv.getElementsAnnotatedWith(AutoImpl.class)) {
