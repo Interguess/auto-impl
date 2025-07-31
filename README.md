@@ -1,5 +1,7 @@
 # Auto-impl
 
+<img width="1500" height="500" alt="Interguess-Auto-impl" src="https://github.com/user-attachments/assets/37912c0a-a55c-4ac2-b0e0-02b9612e6e1c" />
+
 > [!WARNING]  
 > Auto-impl is currently still under active development, we do not yet have a version that is fully operational and
 > performant.<br>
