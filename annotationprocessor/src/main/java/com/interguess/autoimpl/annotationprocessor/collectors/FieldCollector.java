@@ -18,20 +18,20 @@ public class FieldCollector {
     public void collect(final @NotNull ExecutableElement method, final @NotNull MethodType methodType) {
         final String code = methodType.generateCode(method);
 
-        allMethodCodes.add(code);
+        this.allMethodCodes.add(code);
 
         for (final GeneratedField field : methodType.generateFields(method)) {
-            fieldNameToType.put(field.getName(), field.getType().toString());
+            this.fieldNameToType.put(field.getName(), field.getType().toString());
         }
     }
 
     public @NotNull String generateFieldsCode() {
         final Set<String> nonFinalFields = new HashSet<>();
 
-        for (final String fieldName : fieldNameToType.keySet()) {
+        for (final String fieldName : this.fieldNameToType.keySet()) {
             final String search = "this." + fieldName + " =";
 
-            for (final String code : allMethodCodes) {
+            for (final String code : this.allMethodCodes) {
                 if (code.contains(search)) {
                     nonFinalFields.add(fieldName);
 
@@ -42,7 +42,7 @@ public class FieldCollector {
 
         final Map<String, List<String>> fieldsByType = new LinkedHashMap<>();
 
-        for (final Map.Entry<String, String> entry : fieldNameToType.entrySet()) {
+        for (final Map.Entry<String, String> entry : this.fieldNameToType.entrySet()) {
             final String fieldName = entry.getKey();
             final String fieldType = entry.getValue();
 
@@ -89,10 +89,10 @@ public class FieldCollector {
 
         final Set<String> nonFinalFields = new HashSet<>();
 
-        for (final String fieldName : fieldNameToType.keySet()) {
+        for (final String fieldName : this.fieldNameToType.keySet()) {
             final String search = "this." + fieldName + " =";
 
-            for (final String code : allMethodCodes) {
+            for (final String code : this.allMethodCodes) {
                 if (code.contains(search)) {
                     nonFinalFields.add(fieldName);
 
@@ -101,7 +101,7 @@ public class FieldCollector {
             }
         }
 
-        for (final Map.Entry<String, String> entry : fieldNameToType.entrySet()) {
+        for (final Map.Entry<String, String> entry : this.fieldNameToType.entrySet()) {
             final String fieldName = entry.getKey();
             final String fieldType = entry.getValue();
 

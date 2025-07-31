@@ -31,8 +31,8 @@ public class AutoImplProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (classGenerator == null) {
-            processingEnv.getMessager().printMessage(
+        if (this.classGenerator == null) {
+            this.processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     "AutoImplProcessor is not initialized properly. " +
                             "Please ensure that the processing environment is set up correctly."
@@ -43,7 +43,7 @@ public class AutoImplProcessor extends AbstractProcessor {
 
         for (final Element element : roundEnv.getElementsAnnotatedWith(AutoImpl.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
-                classGenerator.generateForInterface((TypeElement) element);
+                this.classGenerator.generateForInterface((TypeElement) element);
             }
         }
 

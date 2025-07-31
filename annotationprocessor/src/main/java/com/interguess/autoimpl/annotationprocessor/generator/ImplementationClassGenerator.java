@@ -32,13 +32,13 @@ public class ImplementationClassGenerator {
 
         this.methodTypeMatcher = new MethodTypeMatcherImpl();
 
-        methodTypeMatcher.registerType("get[a-zA-Z0-9_]+", new GetMethod());
-        methodTypeMatcher.registerType("set[a-zA-Z0-9_]+", new SetMethod());
+        this.methodTypeMatcher.registerType("get[a-zA-Z0-9_]+", new GetMethod());
+        this.methodTypeMatcher.registerType("set[a-zA-Z0-9_]+", new SetMethod());
     }
 
     public void generateForInterface(final @NotNull TypeElement interfaceElement) {
         final String interfaceName = interfaceElement.getSimpleName().toString();
-        final String packageName = processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
+        final String packageName = this.processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
         final String className = interfaceName + "Impl";
         final String qualifiedClassName = packageName + "." + className;
 
@@ -49,7 +49,7 @@ public class ImplementationClassGenerator {
             if (enclosed.getKind() == ElementKind.METHOD) {
                 final ExecutableElement method = (ExecutableElement) enclosed;
 
-                final MethodType methodType = methodTypeMatcher.match(method);
+                final MethodType methodType = this.methodTypeMatcher.match(method);
 
                 if (methodType != null) {
                     methodCollector.collect(method, methodType);
@@ -61,8 +61,6 @@ public class ImplementationClassGenerator {
         final String fieldsCode = fieldCollector.generateFieldsCode();
         final String ctorCode = fieldCollector.generateCtorCode(className);
         final String methodsCode = methodCollector.generateMethodsCode();
-
-       // System.out.println(methodsCode);
 
         final String classHeader = ResourceFileLoaderUtil.load("/class_header.txt");
         final String classStructure = ResourceFileLoaderUtil.load("/class_structure.txt");
@@ -78,13 +76,13 @@ public class ImplementationClassGenerator {
         );
 
         try {
-            final JavaFileObject fileObject = processingEnv.getFiler().createSourceFile(qualifiedClassName, interfaceElement);
+            final JavaFileObject fileObject = this.processingEnv.getFiler().createSourceFile(qualifiedClassName, interfaceElement);
 
             try (final Writer writer = fileObject.openWriter()) {
                 writer.write(classSource);
             }
         } catch (Exception e) {
-            processingEnv.getMessager().printMessage(
+            this.processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     "Failed to generate implementation class: " + e.getMessage(), interfaceElement
             );

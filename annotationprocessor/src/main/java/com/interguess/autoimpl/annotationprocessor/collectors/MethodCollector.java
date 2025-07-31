@@ -15,16 +15,16 @@ public class MethodCollector {
     public void collect(final @NotNull ExecutableElement method, final @NotNull MethodType methodType) {
         final String code = methodType.generateCode(method);
 
-        allMethodCodes.add(code);
+        this.allMethodCodes.add(code);
     }
 
     public @NotNull String generateMethodsCode() {
         final StringBuilder builder = new StringBuilder();
 
-        for (final String code : allMethodCodes) {
+        for (final String code : this.allMethodCodes) {
             builder.append(code);
 
-            if (!code.equals(allMethodCodes.getLast())) {
+            if (!code.equals(this.allMethodCodes.getLast())) {
                 builder.append("\n");
             }
         }

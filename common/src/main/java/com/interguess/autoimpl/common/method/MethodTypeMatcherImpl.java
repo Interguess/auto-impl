@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class MethodTypeMatcherImpl extends MethodTypeMatcher {
 
+    @NotNull
     private final Map<String, MethodType> types;
 
     public MethodTypeMatcherImpl() {
@@ -23,26 +24,26 @@ public class MethodTypeMatcherImpl extends MethodTypeMatcher {
 
     @Override
     public @NotNull List<MethodType> getRegisteredTypes() {
-        return types.values().stream().toList();
+        return this.types.values().stream().toList();
     }
 
     @Override
     public void registerType(@NotNull String methodNameRegex, @NotNull MethodType type) {
-        if (types.containsKey(methodNameRegex)) {
+        if (this.types.containsKey(methodNameRegex)) {
             throw new MethodTypeRegistrationException("Method type with name regex '" + methodNameRegex + "' is already registered.");
         }
 
-        types.put(methodNameRegex, type);
+        this.types.put(methodNameRegex, type);
     }
 
     @Override
     public void unregisterType(@NotNull MethodType type) {
-        types.values().removeIf(existingType -> existingType.equals(type));
+        this.types.values().removeIf(existingType -> existingType.equals(type));
     }
 
     @Override
     public @Nullable MethodType match(@NotNull ExecutableElement method) {
-        for (final Map.Entry<String, MethodType> entry : types.entrySet()) {
+        for (final Map.Entry<String, MethodType> entry : this.types.entrySet()) {
             final String methodNameRegex = entry.getKey();
             final MethodType methodType = entry.getValue();
 
