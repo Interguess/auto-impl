@@ -27,16 +27,28 @@ plugins {
     id 'jacoco'
 }
 
-repositories {
-    mavenCentral()
+group = 'com.interguess'
+version = 'unknown'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 jacoco {
     toolVersion = '0.8.12'
 }
 
-group 'com.interguess'
-version 'unknown'
+repositories {
+    mavenCentral()
+}
+
+def junitPlatformVersion = '1.13.3'
+def junitJupiterVersion = '5.13.3'
+def opentest4jVersion = '1.3.0'
+def lombokVersion = '1.18.38'
+def mockitoVersion = '5.18.0'
 
 subprojects {
     apply plugin: 'java'
@@ -47,54 +59,32 @@ subprojects {
     }
 
     dependencies {
-    testImplementation platform('org.junit:junit-bom:5.13.3')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    // Plattform-Module explizit hinzufügen
-    testImplementation 'org.junit.platform:junit-platform-engine:1.13.3'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.13.3'
-    testImplementation 'org.junit.platform:junit-platform-commons:1.13.3'
-
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
-
-    testImplementation 'org.mockito:mockito-core:5.18.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
-
-    testImplementation('com.google.testing.compile:compile-testing:0.21.0') {
-        exclude group: 'junit', module: 'junit'
+        testImplementation platform("org.junit:junit-bom:$junitJupiterVersion")
+        testImplementation "org.junit.jupiter:junit-jupiter"
+        testImplementation "org.junit.platform:junit-platform-engine:$junitPlatformVersion"
+        testImplementation "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
+        testImplementation "org.junit.platform:junit-platform-commons:$junitPlatformVersion"
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        testImplementation "org.mockito:mockito-core:$mockitoVersion"
+        testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+        testImplementation('com.google.testing.compile:compile-testing:0.21.0') {
+            exclude group: 'junit', module: 'junit'
+        }
     }
-}
 
-
-    // Erzwinge gleiche Versionen für JUnit-Komponenten
     configurations.all {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'org.junit.platform') {
-                details.useVersion '1.13.3'
-                details.because 'Align all JUnit Platform modules to same version to avoid discovery errors'
+                details.useVersion junitPlatformVersion
             }
             if (details.requested.group == 'org.junit.jupiter') {
-                details.useVersion '5.13.3'
-                details.because 'Align all JUnit Jupiter modules to same version'
+                details.useVersion junitJupiterVersion
             }
             if (details.requested.group == 'org.opentest4j') {
-                details.useVersion '1.3.0'
-                details.because 'Compatible version for JUnit 5.13.3'
+                details.useVersion opentest4jVersion
             }
         }
-
-        // JUnit Vintage Engine ausschließen
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    jacoco {
-        toolVersion = '0.8.12'
-    }
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
     }
 
     test {
@@ -115,37 +105,20 @@ subprojects {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
 tasks.named('test') {
     useJUnitPlatform()
+
     javaLauncher.set(javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     })
 }
 
-task jacocoRootReport(type: JacocoReport) {
+tasks.register('jacocoRootReport', JacocoReport) {
     dependsOn subprojects.jacocoTestReport
 
-    def coverageSourceDirs = files()
-    def classDirs = files()
-    def execFiles = files()
-
-    subprojects.each { subproject ->
-        coverageSourceDirs += subproject.sourceSets.main.allSource.srcDirs
-        classDirs += subproject.sourceSets.main.output
-        execFiles += fileTree(dir: subproject.buildDir, includes: [
-            'jacoco/test.exec'
-        ])
-    }
-
-    sourceDirectories.setFrom coverageSourceDirs
-    classDirectories.setFrom classDirs
-    executionData.setFrom execFiles
+    sourceDirectories.setFrom files(subprojects.collect { it.sourceSets.main.allSource.srcDirs }.flatten())
+    classDirectories.setFrom files(subprojects.collect { it.sourceSets.main.output }.flatten())
+    executionData.setFrom files(subprojects.collect { fileTree(dir: it.buildDir, includes: ['jacoco/test.exec']) })
 
     reports {
         html.required = true
