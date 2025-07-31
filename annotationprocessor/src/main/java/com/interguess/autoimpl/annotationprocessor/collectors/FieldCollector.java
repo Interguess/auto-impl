@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.lang.model.element.ExecutableElement;
 import java.util.*;
 
-public class FieldCollector {
+public final class FieldCollector {
 
     @NotNull
     private final Map<String, String> fieldNameToType = new LinkedHashMap<>();
@@ -51,7 +51,9 @@ public class FieldCollector {
 
         final StringBuilder builder = new StringBuilder();
 
-        int i = 0, typeCount = fieldsByType.size();
+        int i = 0;
+
+        final int typeCount = fieldsByType.size();
 
         for (final Map.Entry<String, List<String>> entry : fieldsByType.entrySet()) {
             final String type = entry.getKey();
@@ -59,10 +61,9 @@ public class FieldCollector {
             final List<String> fieldNames = entry.getValue();
 
             for (final String fieldName : fieldNames) {
-                boolean isFinal = !nonFinalFields.contains(fieldName);
+                final boolean isFinal = !nonFinalFields.contains(fieldName);
 
-                builder
-                        .append("    private ")
+                builder.append("    private ")
                         .append(isFinal ? "final " : "")
                         .append(type)
                         .append(" ")
@@ -77,7 +78,6 @@ public class FieldCollector {
                 builder.append("\n");
             }
         }
-
         builder.append("\n");
 
         return builder.toString();
@@ -86,15 +86,16 @@ public class FieldCollector {
     public @NotNull String generateCtorCode(final @NotNull String className) {
         final List<String> finalFieldNames = new ArrayList<>();
         final List<String> finalFieldTypes = new ArrayList<>();
-
-        final Set<String> nonFinalFields = new HashSet<>();
+        final List<String> nonFinalFieldNames = new ArrayList<>();
+        final List<String> nonFinalFieldTypes = new ArrayList<>();
 
         for (final String fieldName : this.fieldNameToType.keySet()) {
             final String search = "this." + fieldName + " =";
 
             for (final String code : this.allMethodCodes) {
                 if (code.contains(search)) {
-                    nonFinalFields.add(fieldName);
+                    nonFinalFieldNames.add(fieldName);
+                    nonFinalFieldTypes.add(this.fieldNameToType.get(fieldName));
 
                     break;
                 }
@@ -105,7 +106,7 @@ public class FieldCollector {
             final String fieldName = entry.getKey();
             final String fieldType = entry.getValue();
 
-            boolean isFinal = !nonFinalFields.contains(fieldName);
+            final boolean isFinal = !nonFinalFieldNames.contains(fieldName);
 
             if (isFinal) {
                 finalFieldNames.add(fieldName);
@@ -115,9 +116,11 @@ public class FieldCollector {
 
         final StringBuilder ctorBuilder = new StringBuilder();
 
-        ctorBuilder.append("\n");
-
-        ctorBuilder.append("    public ").append(className).append("(");
+        ctorBuilder
+                .append("\n")
+                .append("    public ")
+                .append(className)
+                .append("(");
 
         for (int j = 0; j < finalFieldNames.size(); j++) {
             if (j > 0) {
@@ -126,14 +129,58 @@ public class FieldCollector {
 
             ctorBuilder.append(finalFieldTypes.get(j)).append(" ").append(finalFieldNames.get(j));
         }
-
         ctorBuilder.append(") {\n");
 
-        for (String fieldName : finalFieldNames) {
+        for (final String fieldName : finalFieldNames) {
             ctorBuilder.append("        this.").append(fieldName).append(" = ").append(fieldName).append(";\n");
         }
 
-        ctorBuilder.append("    }\n");
+        ctorBuilder.append("    }\n\n");
+
+        if (!nonFinalFieldNames.isEmpty()) {
+            ctorBuilder.append("    public ").append(className).append("(");
+
+            for (int i = 0; i < finalFieldNames.size(); i++) {
+                if (i > 0) {
+                    ctorBuilder.append(", ");
+                }
+
+                ctorBuilder.append(finalFieldTypes.get(i)).append(" ").append(finalFieldNames.get(i));
+            }
+            for (int i = 0; i < nonFinalFieldNames.size(); i++) {
+                if (i > 0 || !finalFieldNames.isEmpty()) {
+                    ctorBuilder.append(", ");
+                }
+
+                ctorBuilder.append(nonFinalFieldTypes.get(i)).append(" ").append(nonFinalFieldNames.get(i));
+            }
+
+            ctorBuilder.append(") {\n");
+
+            for (final String fieldName : finalFieldNames) {
+                ctorBuilder
+                        .append("        this.")
+                        .append(fieldName)
+                        .append(" = ")
+                        .append(fieldName)
+                        .append(";\n");
+            }
+
+            if (!finalFieldNames.isEmpty()) {
+                ctorBuilder.append("\n");
+            }
+
+            for (final String fieldName : nonFinalFieldNames) {
+                ctorBuilder
+                        .append("        this.")
+                        .append(fieldName)
+                        .append(" = ")
+                        .append(fieldName)
+                        .append(";\n");
+            }
+
+            ctorBuilder.append("    }\n");
+        }
 
         return ctorBuilder.toString();
     }
