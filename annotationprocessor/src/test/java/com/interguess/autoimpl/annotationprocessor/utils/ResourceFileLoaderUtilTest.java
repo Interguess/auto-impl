@@ -24,24 +24,32 @@
 
 package com.interguess.autoimpl.annotationprocessor.utils;
 
-import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+public class ResourceFileLoaderUtilTest {
 
-@UtilityClass
-public class ResourceFileLoaderUtil {
+    @Test
+    public void testLoadResourceFile() {
+        Assertions.assertEquals(
+                """
+                        FZ wv3&AlFx1PR|im 5m7bNL
+                        Ff1UIdPOe|NR/ gw TpAAvfh
+                        KE7U nU| L$yMeykZxGogsl9
+                        lNDiFcnWgE5O e4|d GOjjG
+                        oJF Q oDb7xqf|/we5Bso1bM
+                        GgX5cp4qb|§c AL i0x1HN3r
+                        ZzvoRGTZufTfke!  uX|KQKN
+                        noTFnreOI 7ga 74Lkr|J^WL
+                        4mpBA I4G 7p|cMAH9_4cQ3Z
+                        piWZAUSZ:Jtt6a8qF N |Bfy""",
+                ResourceFileLoaderUtil.load("/test-1.txt")
+        );
 
-    public static @NotNull String load(final @NotNull String resourceFileName) {
-        try (final InputStream inputStream = ResourceFileLoaderUtil.class.getResourceAsStream(resourceFileName)) {
-            if (inputStream == null) {
-                throw new FileNotFoundException("Failed to load resource file: " + resourceFileName);
-            }
+        Assertions.assertEquals("sLyurr0tIQrIAjx6ClS7", ResourceFileLoaderUtil.load("/test-2.txt"));
 
-            return new String(inputStream.readAllBytes()).replace("\r\n", "\n").replace("\r", "\n");
-        } catch (Exception e) {
-            throw new RuntimeException("Error reading resource file: " + resourceFileName, e);
-        }
+        Assertions.assertThrows(RuntimeException.class, () -> ResourceFileLoaderUtil.load("test1.txt"));
+        Assertions.assertThrows(RuntimeException.class, () -> ResourceFileLoaderUtil.load("test-2.txt"));
+        Assertions.assertThrows(RuntimeException.class, () -> ResourceFileLoaderUtil.load("tes/t"));
     }
 }

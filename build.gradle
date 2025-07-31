@@ -22,13 +22,133 @@
  * SOFTWARE.
  */
 
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+repositories {
+    mavenCentral()
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
 group 'com.interguess'
 version 'unknown'
 
-allprojects {
+subprojects {
     apply plugin: 'java'
-    
+    apply plugin: 'jacoco'
+
     repositories {
         mavenCentral()
+    }
+
+    dependencies {
+    testImplementation platform('org.junit:junit-bom:5.13.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Plattform-Module explizit hinzufügen
+    testImplementation 'org.junit.platform:junit-platform-engine:1.13.3'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.13.3'
+    testImplementation 'org.junit.platform:junit-platform-commons:1.13.3'
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
+
+    testImplementation('com.google.testing.compile:compile-testing:0.21.0') {
+        exclude group: 'junit', module: 'junit'
+    }
+}
+
+
+    // Erzwinge gleiche Versionen für JUnit-Komponenten
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.junit.platform') {
+                details.useVersion '1.13.3'
+                details.because 'Align all JUnit Platform modules to same version to avoid discovery errors'
+            }
+            if (details.requested.group == 'org.junit.jupiter') {
+                details.useVersion '5.13.3'
+                details.because 'Align all JUnit Jupiter modules to same version'
+            }
+            if (details.requested.group == 'org.opentest4j') {
+                details.useVersion '1.3.0'
+                details.because 'Compatible version for JUnit 5.13.3'
+            }
+        }
+
+        // JUnit Vintage Engine ausschließen
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    jacoco {
+        toolVersion = '0.8.12'
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestReport
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(21)
+        })
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    })
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    dependsOn subprojects.jacocoTestReport
+
+    def coverageSourceDirs = files()
+    def classDirs = files()
+    def execFiles = files()
+
+    subprojects.each { subproject ->
+        coverageSourceDirs += subproject.sourceSets.main.allSource.srcDirs
+        classDirs += subproject.sourceSets.main.output
+        execFiles += fileTree(dir: subproject.buildDir, includes: [
+            'jacoco/test.exec'
+        ])
+    }
+
+    sourceDirectories.setFrom coverageSourceDirs
+    classDirectories.setFrom classDirs
+    executionData.setFrom execFiles
+
+    reports {
+        html.required = true
+        xml.required = true
     }
 }
