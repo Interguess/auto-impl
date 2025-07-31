@@ -2,7 +2,11 @@ dependencies {
     implementation project(':api')
     implementation project(':common')
 
-    implementation 'com.google.auto.service:auto-service:1.0-rc5'
+    implementation 'com.google.auto.service:auto-service:1.1.1'
 
-    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc5'
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 }
