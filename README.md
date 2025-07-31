@@ -65,6 +65,6 @@ If you are using maven, add this snippet to your pom.xml.
 
 <div>
     <img src="https://img.shields.io/codefactor/grade/github/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="Codefactor">
-    <img src="https://img.shields.io/codecov/c/github/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="Code coverage">
-    <img src="https://img.shields.io/github/license/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="License">
+    <img src="https://img.shields.io/codecov/c/github/Interguess/auto-impl?style=for-the-badge&logo=codecov&logoColor=white" alt="Code coverage">
+    <img src="https://img.shields.io/github/license/Interguess/auto-impl?style=for-the-badge&logo=license&logoColor=white" alt="License">
 </div>
