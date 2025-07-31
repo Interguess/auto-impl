@@ -115,6 +115,8 @@ public class FieldCollector {
 
         final StringBuilder ctorBuilder = new StringBuilder();
 
+        ctorBuilder.append("\n");
+
         ctorBuilder.append("    public ").append(className).append("(");
 
         for (int j = 0; j < finalFieldNames.size(); j++) {
@@ -131,7 +133,7 @@ public class FieldCollector {
             ctorBuilder.append("        this.").append(fieldName).append(" = ").append(fieldName).append(";\n");
         }
 
-        ctorBuilder.append("    }\n\n");
+        ctorBuilder.append("    }\n");
 
         return ctorBuilder.toString();
     }

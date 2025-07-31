@@ -5,5 +5,4 @@ public class %s implements %s {
 
 %s
 %s
-%s
-}
+%s}

@@ -22,7 +22,11 @@ public class MethodCollector {
         final StringBuilder builder = new StringBuilder();
 
         for (final String code : allMethodCodes) {
-            builder.append(code).append("\n");
+            builder.append(code);
+
+            if (!code.equals(allMethodCodes.getLast())) {
+                builder.append("\n");
+            }
         }
 
         return builder.toString();
