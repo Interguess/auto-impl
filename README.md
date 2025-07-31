@@ -27,7 +27,9 @@ repositories {
 
 ```groovy
 dependencies {
-    compileOnly 'com.interguess:auto-impl:VERSION'
+    compileOnly 'com.interguess.autoimpl:api:VERSION'
+
+    annotationProcessor 'com.interguess.autoimpl:annotationprocessor:VERSION'
 }
 ```
 
@@ -36,23 +38,33 @@ dependencies {
 If you are using maven, add this snippet to your pom.xml.
 
 ```xml
-
 <repositories>
     <repository>
         <id>auto-impl-github-packages</id>
         <name>Github Packages for auto-impl repository</name>
-        <url>https://maven.pkg.github.com/interguess/javaflow</url>
+        <url>https://maven.pkg.github.com/interguess/auto-impl</url>
     </repository>
 </repositories>
 ```
 
 ```xml
-
 <dependencies>
     <dependency>
-        <groupId>com.interguess</groupId>
-        <artifactId>auto-impl</artifactId>
+        <groupId>com.interguess.autoimpl</groupId>
+        <artifactId>api</artifactId>
         <version>VERSION</version>
+    </dependency>
+    <dependency>
+        <groupId>com.interguess.autoimpl</groupId>
+        <artifactId>annotationprocessor</artifactId>
+        <version>VERSION</version>
+        <scope>provided</scope>
     </dependency>
 </dependencies>
 ```
+
+<div>
+    <img src="https://img.shields.io/codefactor/grade/github/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="Codefactor">
+    <img src="https://img.shields.io/codecov/c/github/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="Code coverage">
+    <img src="https://img.shields.io/github/license/Interguess/auto-impl?style=for-the-badge&logo=codefactor&logoColor=white" alt="License">
+</div>
