@@ -1,0 +1,8 @@
+package %s;
+
+%s
+public class %s implements %s {
+
+    %s
+    %s
+}
