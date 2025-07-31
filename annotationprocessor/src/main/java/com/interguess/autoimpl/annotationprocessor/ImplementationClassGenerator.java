@@ -1,0 +1,92 @@
+package com.interguess.autoimpl.annotationprocessor;
+
+import com.interguess.autoimpl.annotationprocessor.collectors.FieldCollector;
+import com.interguess.autoimpl.annotationprocessor.collectors.MethodCollector;
+import com.interguess.autoimpl.annotationprocessor.utils.ResourceFileLoaderUtil;
+import com.interguess.autoimpl.api.method.MethodType;
+import com.interguess.autoimpl.api.method.MethodTypeMatcher;
+import com.interguess.autoimpl.common.method.MethodTypeMatcherImpl;
+import com.interguess.autoimpl.common.methodtypes.GetMethod;
+import com.interguess.autoimpl.common.methodtypes.SetMethod;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+
+public class ImplementationClassGenerator {
+
+    @NotNull
+    private final ProcessingEnvironment processingEnv;
+
+    @NotNull
+    private final MethodTypeMatcher methodTypeMatcher;
+
+    public ImplementationClassGenerator(final @NotNull ProcessingEnvironment processingEnv) {
+        this.processingEnv = processingEnv;
+
+        this.methodTypeMatcher = new MethodTypeMatcherImpl();
+
+        methodTypeMatcher.registerType("get[a-zA-Z0-9_]+", new GetMethod());
+        methodTypeMatcher.registerType("set[a-zA-Z0-9_]+", new SetMethod());
+    }
+
+    public void generateForInterface(final @NotNull TypeElement interfaceElement) {
+        final String interfaceName = interfaceElement.getSimpleName().toString();
+        final String packageName = processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
+        final String className = interfaceName + "Impl";
+        final String qualifiedClassName = packageName + "." + className;
+
+        final FieldCollector fieldCollector = new FieldCollector();
+        final MethodCollector methodCollector = new MethodCollector();
+
+        for (final Element enclosed : interfaceElement.getEnclosedElements()) {
+            if (enclosed.getKind() == ElementKind.METHOD) {
+                final ExecutableElement method = (ExecutableElement) enclosed;
+
+                final MethodType methodType = methodTypeMatcher.match(method);
+
+                if (methodType != null) {
+                    methodCollector.collect(method, methodType);
+                    fieldCollector.collect(method, methodType);
+                }
+            }
+        }
+
+        final String fieldsCode = fieldCollector.generateFieldsCode();
+        final String ctorCode = fieldCollector.generateCtorCode(className);
+        final String methodsCode = methodCollector.generateMethodsCode();
+
+        final String classHeader = ResourceFileLoaderUtil.load("/class_header.txt");
+        final String classStructure = ResourceFileLoaderUtil.load("/class_structure.txt");
+
+        final String classSource = classStructure.formatted(
+                packageName,
+                classHeader,
+                className,
+                interfaceName,
+                fieldsCode.stripTrailing(),
+                ctorCode,
+                methodsCode
+        );
+
+        try {
+            final JavaFileObject fileObject = processingEnv.getFiler().createSourceFile(qualifiedClassName, interfaceElement);
+
+            try (final java.io.Writer writer = fileObject.openWriter()) {
+                writer.write(classSource);
+            }
+        } catch (Exception e) {
+            processingEnv.getMessager().printMessage(
+                    Diagnostic.Kind.ERROR,
+                    "Failed to generate implementation class: " + e.getMessage(), interfaceElement
+            );
+
+            throw new RuntimeException("Failed to generate implementation class for " + interfaceName, e);
+        }
+    }
+}

@@ -15,7 +15,7 @@ public class FieldCollector {
     @NotNull
     private final List<String> allMethodCodes = new ArrayList<>();
 
-    public void collect(@NotNull ExecutableElement method, @NotNull MethodType methodType) {
+    public void collect(final @NotNull ExecutableElement method, final @NotNull MethodType methodType) {
         final String code = methodType.generateCode(method);
 
         allMethodCodes.add(code);
@@ -83,7 +83,7 @@ public class FieldCollector {
         return builder.toString();
     }
 
-    public String generateCtorCode(String className) {
+    public @NotNull String generateCtorCode(final @NotNull String className) {
         final List<String> finalFieldNames = new ArrayList<>();
         final List<String> finalFieldTypes = new ArrayList<>();
 

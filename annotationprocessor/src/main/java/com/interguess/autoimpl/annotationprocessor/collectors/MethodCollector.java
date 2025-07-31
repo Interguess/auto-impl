@@ -12,7 +12,7 @@ public class MethodCollector {
     @NotNull
     private final List<String> allMethodCodes = new ArrayList<>();
 
-    public void collect(@NotNull ExecutableElement method, @NotNull MethodType methodType) {
+    public void collect(final @NotNull ExecutableElement method, final @NotNull MethodType methodType) {
         final String code = methodType.generateCode(method);
 
         allMethodCodes.add(code);
