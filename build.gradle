@@ -1,0 +1,10 @@
+group 'com.interguess'
+version 'unknown'
+
+allprojects {
+    apply plugin: 'java'
+    
+    repositories {
+        mavenCentral()
+    }
+}

@@ -1,0 +1,5 @@
+rootProject.name = 'auto-impl'
+include 'api'
+include 'annotationprocessor'
+include 'common'
+include 'demo'
