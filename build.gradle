@@ -25,10 +25,11 @@
 plugins {
     id 'java'
     id 'jacoco'
+    id 'org.sonarqube' version '6.2.0.5505'
 }
 
-group = 'com.interguess'
-version = 'unknown'
+group 'com.interguess'
+version 'unknown'
 
 java {
     toolchain {
@@ -38,6 +39,14 @@ java {
 
 jacoco {
     toolVersion = '0.8.12'
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "Interguess_auto-impl"
+    property "sonar.organization", "interguess"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 repositories {
