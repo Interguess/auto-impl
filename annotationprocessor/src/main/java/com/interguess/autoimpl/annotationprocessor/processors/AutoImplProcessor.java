@@ -27,6 +27,10 @@ package com.interguess.autoimpl.annotationprocessor.processors;
 import com.google.auto.service.AutoService;
 import com.interguess.autoimpl.annotationprocessor.generator.ImplementationClassGenerator;
 import com.interguess.autoimpl.api.annotations.AutoImpl;
+import com.interguess.autoimpl.api.annotations.RegisterMethod;
+import com.interguess.autoimpl.api.method.MethodType;
+import com.interguess.autoimpl.api.method.MethodTypeMatcher;
+import com.interguess.autoimpl.common.method.MethodTypeMatcherImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +40,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 @AutoService(Processor.class)
@@ -49,6 +54,39 @@ public class AutoImplProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(final @NotNull ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
+
+        MethodTypeMatcher.setInstance(new MethodTypeMatcherImpl());
+
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Loading MethodType implementations...");
+
+        ServiceLoader.load(MethodType.class, MethodType.class.getClassLoader()).forEach(methodType -> {
+            processingEnv.getMessager().printMessage(
+                    Diagnostic.Kind.NOTE,
+                    "Registering MethodType: " + methodType.getClass().getName()
+            );
+
+            final RegisterMethod registerAnnotation = methodType.getClass().getAnnotation(RegisterMethod.class);
+
+            if (registerAnnotation == null) {
+                processingEnv.getMessager().printMessage(
+                        Diagnostic.Kind.ERROR,
+                        "MethodType " + methodType.getClass().getName() + " is missing @RegisterMethod annotation."
+                );
+                return;
+            }
+
+            System.out.println(methodType.getClass().getName());
+
+            MethodTypeMatcher.getInstance().registerType(
+                    registerAnnotation.value(),
+                    methodType
+            );
+        });
+
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.NOTE,
+                "MethodType implementations loaded successfully."
+        );
 
         this.classGenerator = new ImplementationClassGenerator(processingEnv);
     }

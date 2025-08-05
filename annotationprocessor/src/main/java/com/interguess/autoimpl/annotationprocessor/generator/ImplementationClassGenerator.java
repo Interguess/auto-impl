@@ -30,8 +30,6 @@ import com.interguess.autoimpl.annotationprocessor.utils.ResourceFileLoaderUtil;
 import com.interguess.autoimpl.api.method.MethodType;
 import com.interguess.autoimpl.api.method.MethodTypeMatcher;
 import com.interguess.autoimpl.common.method.MethodTypeMatcherImpl;
-import com.interguess.autoimpl.common.methodtypes.GetMethod;
-import com.interguess.autoimpl.common.methodtypes.SetMethod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -54,10 +52,7 @@ public class ImplementationClassGenerator {
     public ImplementationClassGenerator(final @NotNull ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
 
-        this.methodTypeMatcher = new MethodTypeMatcherImpl();
-
-        this.methodTypeMatcher.registerType("get[a-zA-Z0-9_]+", new GetMethod());
-        this.methodTypeMatcher.registerType("set[a-zA-Z0-9_]+", new SetMethod());
+        this.methodTypeMatcher = MethodTypeMatcherImpl.getInstance();
     }
 
     public void generateForInterface(final @NotNull TypeElement interfaceElement) {

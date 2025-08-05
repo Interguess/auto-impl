@@ -26,6 +26,7 @@ package com.interguess.autoimpl.common.methodtypes;
 
 import com.google.common.base.Preconditions;
 import com.interguess.autoimpl.api.annotations.AutoField;
+import com.interguess.autoimpl.api.annotations.RegisterMethod;
 import com.interguess.autoimpl.api.field.GeneratedField;
 import com.interguess.autoimpl.api.method.MethodType;
 import com.interguess.autoimpl.common.field.GeneratedFieldImpl;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
+@RegisterMethod("set[a-zA-Z0-9_]+")
 public class SetMethod implements MethodType {
 
     @Override
