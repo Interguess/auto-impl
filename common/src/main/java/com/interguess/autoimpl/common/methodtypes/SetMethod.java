@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
-@RegisterMethod("set[a-zA-Z0-9_]+")
+@RegisterMethod("set")
 public class SetMethod implements MethodType {
 
     @Override

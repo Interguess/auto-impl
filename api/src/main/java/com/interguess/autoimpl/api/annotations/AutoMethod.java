@@ -26,26 +26,12 @@ package com.interguess.autoimpl.api.annotations;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * This annotation is used to mark method type classes that should be registered.
- * The annotation processor will scan for classes annotated with this
- * annotation and registers them before processing the @AutoImpl annotation.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface RegisterMethod {
+public @interface AutoMethod {
 
     /**
-     * The id of the method type.
-     * Every method type must have a unique id which then can be used in the @AutoMethod annotation to set
-     * the code generator for this specific method.
+     * The id of the method's code-generator which should be used to generate the implementation of the annotated method.
      *
-     * @return the id of the method type.
+     * @return the id of the method's code-generator to use.
      */
     @NotNull String value();
 }

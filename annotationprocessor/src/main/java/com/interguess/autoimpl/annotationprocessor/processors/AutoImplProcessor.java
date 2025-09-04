@@ -106,6 +106,13 @@ public class AutoImplProcessor extends AbstractProcessor {
         for (final Element element : roundEnv.getElementsAnnotatedWith(AutoImpl.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
                 this.classGenerator.generateForInterface((TypeElement) element);
+            } else {
+                this.processingEnv.getMessager().printMessage(
+                        Diagnostic.Kind.ERROR,
+                        "@AutoImpl can only be applied to interfaces. " +
+                                "Invalid element: " + element.getSimpleName(),
+                        element
+                );
             }
         }
 

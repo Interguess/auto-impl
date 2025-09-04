@@ -60,22 +60,22 @@ public abstract class MethodTypeMatcher {
     public abstract @NotNull List<MethodType> getRegisteredTypes();
 
     /**
-     * Registers a method type with a regex pattern for matching method names.
+     * Registers a method type with a specific id.
      *
-     * @param methodNameRegex the regex pattern to match method names
-     * @param type            the MethodType to register
+     * @param methodTypeId the id of the MethodType to register, as specified in the AutoMethod annotation
+     * @param type         the MethodType to register
      */
-    public abstract void registerType(@NotNull String methodNameRegex, @NotNull MethodType type);
+    public abstract void registerType(@NotNull String methodTypeId, @NotNull MethodType type);
 
     /**
-     * Unregisters a method type.
+     * Unregisters a method type by its id.
      *
-     * @param type the MethodType to unregister
+     * @param methodTypeId the id of the MethodType to unregister
      */
-    public abstract void unregisterType(@NotNull MethodType type);
+    public abstract void unregisterType(@NotNull String methodTypeId);
 
     /**
-     * Matches a method type based on the method name of the provided ExecutableElement.
+     * Matches a method type based on the @AutoMethod annotation of the given ExecutableElement.
      *
      * @param method the ExecutableElement representing the method to match
      * @return the matched MethodType, or null if no match is found

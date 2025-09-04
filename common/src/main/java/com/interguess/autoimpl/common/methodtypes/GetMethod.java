@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
-@RegisterMethod("get[a-zA-Z0-9_]+")
+@RegisterMethod("get")
 public class GetMethod implements MethodType {
 
     @Override

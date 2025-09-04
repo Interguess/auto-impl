@@ -24,6 +24,7 @@
 
 package com.interguess.autoimpl.common.method;
 
+import com.interguess.autoimpl.api.annotations.AutoMethod;
 import com.interguess.autoimpl.api.exception.MethodTypeRegistrationException;
 import com.interguess.autoimpl.api.method.MethodType;
 import com.interguess.autoimpl.api.method.MethodTypeMatcher;
@@ -52,30 +53,33 @@ public class MethodTypeMatcherImpl extends MethodTypeMatcher {
     }
 
     @Override
-    public void registerType(@NotNull String methodNameRegex, @NotNull MethodType type) {
-        if (this.types.containsKey(methodNameRegex)) {
-            throw new MethodTypeRegistrationException("Method type with name regex '" + methodNameRegex + "' is already registered.");
+    public void registerType(@NotNull String methodTypeId, @NotNull MethodType type) {
+        if (this.types.containsKey(methodTypeId)) {
+            throw new MethodTypeRegistrationException("Method type with the id '" + methodTypeId + "' is already registered.");
         }
 
-        this.types.put(methodNameRegex, type);
+        this.types.put(methodTypeId, type);
     }
 
     @Override
-    public void unregisterType(@NotNull MethodType type) {
-        this.types.values().removeIf(existingType -> existingType.equals(type));
+    public void unregisterType(@NotNull String methodTypeId) {
+        this.types.remove(methodTypeId);
     }
 
     @Override
     public @Nullable MethodType match(@NotNull ExecutableElement method) {
-        for (final Map.Entry<String, MethodType> entry : this.types.entrySet()) {
-            final String methodNameRegex = entry.getKey();
-            final MethodType methodType = entry.getValue();
+        final AutoMethod annotation = method.getAnnotation(AutoMethod.class);
 
-            if (method.getSimpleName().toString().matches(methodNameRegex)) {
-                return methodType;
-            }
+        if (annotation == null) {
+            throw new IllegalStateException("Method " + method.getSimpleName() + " is not annotated with @AutoMethod");
         }
 
-        return null;
+        final MethodType type = this.types.get(annotation.value());
+
+        if (type == null) {
+            throw new IllegalStateException("No method type registered with the id '" + annotation.value() + "'");
+        }
+
+        return type;
     }
 }

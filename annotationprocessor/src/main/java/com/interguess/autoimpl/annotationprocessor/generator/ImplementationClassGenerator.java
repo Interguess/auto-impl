@@ -28,6 +28,7 @@ import com.interguess.autoimpl.annotationprocessor.collectors.FieldCollector;
 import com.interguess.autoimpl.annotationprocessor.collectors.MethodCollector;
 import com.interguess.autoimpl.annotationprocessor.utils.ResourceFileLoaderUtil;
 import com.interguess.autoimpl.api.annotations.AutoImpl;
+import com.interguess.autoimpl.api.annotations.AutoMethod;
 import com.interguess.autoimpl.api.method.MethodType;
 import com.interguess.autoimpl.api.method.MethodTypeMatcher;
 import com.interguess.autoimpl.common.method.MethodTypeMatcherImpl;
@@ -89,7 +90,9 @@ public class ImplementationClassGenerator {
         final MethodCollector methodCollector = new MethodCollector();
 
         for (final Element enclosed : interfaceElement.getEnclosedElements()) {
-            if (enclosed.getKind() == ElementKind.METHOD) {
+            final AutoMethod autoMethodAnnotation = enclosed.getAnnotation(AutoMethod.class);
+
+            if (enclosed.getKind() == ElementKind.METHOD && autoMethodAnnotation != null) {
                 final ExecutableElement method = (ExecutableElement) enclosed;
 
                 final MethodType methodType = this.methodTypeMatcher.match(method);
