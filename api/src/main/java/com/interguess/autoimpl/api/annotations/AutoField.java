@@ -33,6 +33,9 @@ import java.lang.annotation.Target;
  * Annotation to mark a method that's implementation should reference to a specific field.
  * E.g. if you have a getter and a setter you set their field name with this annotation to the same value,
  * auto-impl will generate getter and setter implementations for their common field.
+ *
+ * @implNote This annotation as it does not automatically create a field, it just links methods to a field name so other
+ * code generators can use the same field name for multiple methods.
  */
 @Target({ElementType.METHOD})
 public @interface AutoField {
