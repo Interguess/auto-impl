@@ -27,6 +27,7 @@ package com.interguess.autoimpl.annotationprocessor.generator;
 import com.interguess.autoimpl.annotationprocessor.collectors.FieldCollector;
 import com.interguess.autoimpl.annotationprocessor.collectors.MethodCollector;
 import com.interguess.autoimpl.annotationprocessor.utils.ResourceFileLoaderUtil;
+import com.interguess.autoimpl.api.annotations.AutoImpl;
 import com.interguess.autoimpl.api.method.MethodType;
 import com.interguess.autoimpl.api.method.MethodTypeMatcher;
 import com.interguess.autoimpl.common.method.MethodTypeMatcherImpl;
@@ -56,12 +57,35 @@ public class ImplementationClassGenerator {
     }
 
     public void generateForInterface(final @NotNull TypeElement interfaceElement) {
+        final AutoImpl autoImplAnnotation = interfaceElement.getAnnotation(AutoImpl.class);
+
+        if (autoImplAnnotation == null) {
+            this.processingEnv.getMessager().printMessage(
+                    Diagnostic.Kind.ERROR,
+                    "The interface must be annotated with @AutoImpl to generate an implementation class.",
+                    interfaceElement
+            );
+
+            return;
+        }
+
+        if (!autoImplAnnotation.value().matches("[A-Z][a-zA-Z0-9_]*")) {
+            this.processingEnv.getMessager().printMessage(
+                    Diagnostic.Kind.ERROR,
+                    "The value of @AutoImpl must be a valid class name suffix (start with an uppercase letter and contain only letters, digits, and underscores).",
+                    interfaceElement
+            );
+
+            return;
+        }
+
         final String interfaceName = interfaceElement.getSimpleName().toString();
         final String packageName = this.processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
-        final String className = interfaceName + "Impl";
+        final String className = interfaceName + autoImplAnnotation.value();
         final String qualifiedClassName = packageName + "." + className;
 
         final FieldCollector fieldCollector = new FieldCollector();
+
         final MethodCollector methodCollector = new MethodCollector();
 
         for (final Element enclosed : interfaceElement.getEnclosedElements()) {

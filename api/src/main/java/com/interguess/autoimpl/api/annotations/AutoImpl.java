@@ -24,6 +24,8 @@
 
 package com.interguess.autoimpl.api.annotations;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Target;
 
 /**
@@ -31,4 +33,11 @@ import java.lang.annotation.Target;
  */
 @Target({java.lang.annotation.ElementType.TYPE})
 public @interface AutoImpl {
+
+    /**
+     * The suffix of the generated implementation class name.
+     *
+     * @return for example User annotated with @AutoImpl("Impl") will generate "UserImpl" class.
+     */
+    @NotNull String value() default "Impl";
 }
